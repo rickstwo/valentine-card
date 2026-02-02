@@ -1,124 +1,235 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Valentine 💖</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Valentine?</title>
   <style>
-    body {
+    :root {
+      --bg1: #ffe6ef;
+      --bg2: #fff7fb;
+      --card: #ffffff;
+      --text: #1f1f1f;
+      --yes: #ff3b7a;
+      --shadow: rgba(0,0,0,0.12);
+    }
+
+    html, body {
+      height: 100%;
       margin: 0;
-      height: 100vh;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: radial-gradient(circle at 20% 10%, var(--bg2), var(--bg1));
       overflow: hidden;
-      font-family: 'Arial', sans-serif;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background-color: #ffebf0;
     }
 
-    /* Floating hearts background */
-    .heart {
-      position: absolute;
-      color: rgba(255, 105, 180, 0.6);
-      font-size: 24px;
-      animation: floatUp 8s linear infinite;
+    /* Heart background pattern */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      opacity: 0.22;
+      background-size: 120px 120px;
+      background-repeat: repeat;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Cpath fill='%23ff3b7a' fill-opacity='0.55' d='M60 98s-34-20-46-40C6 43 12 27 27 24c10-2 19 3 24 10 5-7 14-12 24-10 15 3 21 19 13 34-12 20-46 40-46 40z'/%3E%3C/svg%3E");
+      pointer-events: none;
     }
 
-    @keyframes floatUp {
-      0% {
-        transform: translateY(100vh);
-        opacity: 0;
-      }
-      10% { opacity: 1; }
-      100% {
-        transform: translateY(-10vh);
-        opacity: 0;
-      }
+    /* Center card */
+    .overlay {
+      position: fixed;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      padding: 24px;
     }
 
-    /* Valentine box */
     .card {
-      position: relative;
-      background: white;
-      padding: 40px;
-      border-radius: 16px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+      width: min(560px, 94vw);
+      background: var(--card);
+      border-radius: 18px;
+      box-shadow: 0 18px 50px var(--shadow);
+      padding: 28px 24px;
       text-align: center;
-      z-index: 10;
+      position: relative;
     }
 
     h1 {
-      margin-bottom: 30px;
-      color: #e6005c;
+      margin: 0 0 10px;
+      font-size: clamp(24px, 3.2vw, 34px);
+      letter-spacing: 0.2px;
+      color: var(--text);
     }
 
-    .buttons {
+    p {
+      margin: 0 0 18px;
+      color: #444;
+      font-size: 15px;
+    }
+
+    .btn-row {
       display: flex;
-      gap: 20px;
       justify-content: center;
+      gap: 14px;
+      margin-top: 10px;
+      flex-wrap: wrap;
     }
 
     button {
-      padding: 12px 26px;
+      border: 0;
+      border-radius: 999px;
+      padding: 12px 18px;
       font-size: 16px;
-      border-radius: 8px;
-      border: none;
       cursor: pointer;
+      user-select: none;
+      transition: transform 0.12s ease, box-shadow 0.12s ease;
     }
 
-    #yes {
-      background-color: #ff4d88;
+    #yesBtn {
+      background: var(--yes);
       color: white;
+      box-shadow: 0 10px 18px rgba(255, 59, 122, 0.25);
+    }
+    #yesBtn:hover { transform: translateY(-1px); }
+
+    #noBtn {
+      background: #f2f2f2;
+      color: #333;
+      box-shadow: 0 10px 18px rgba(0,0,0,0.08);
+      position: fixed; /* lets it run away anywhere on screen */
+      left: 50%;
+      top: 50%;
+      transform: translate(70px, 40px);
     }
 
-    #no {
-      background-color: #ccc;
-      color: black;
-      position: absolute;
+    .success {
+      display: none;
+      margin-top: 16px;
+      font-weight: 600;
+      color: #0c7a3b;
+    }
+
+    /* little floating hearts for extra vibe */
+    .float-heart {
+      position: fixed;
+      font-size: 18px;
+      opacity: 0.85;
+      animation: rise 3.6s linear forwards;
+      pointer-events: none;
+      filter: drop-shadow(0 6px 10px rgba(0,0,0,0.12));
+    }
+    @keyframes rise {
+      from { transform: translateY(0) scale(1); opacity: 0.9; }
+      to   { transform: translateY(-220px) scale(1.2); opacity: 0; }
     }
   </style>
 </head>
 <body>
+  <div class="overlay">
+    <div class="card" id="card">
+      <h1>Joyce will you be my valentine 💘</h1>
+      <p>(Choose wisely 😄)</p>
 
-  <div class="card">
-    <h1>Joyce, will you be my Valentine? 💖</h1>
-    <div class="buttons">
-      <button id="yes" onclick="yesClicked()">Yes</button>
-      <button id="no">No</button>
+      <div class="btn-row">
+        <button id="yesBtn">Yes</button>
+        <!-- "No" button is positioned fixed and will dodge the mouse -->
+        <button id="noBtn" aria-label="No">No</button>
+      </div>
+
+      <div class="success" id="successMsg">YAYYY 🎉💖</div>
     </div>
   </div>
 
   <script>
-    const noBtn = document.getElementById("no");
+    const noBtn = document.getElementById("noBtn");
+    const yesBtn = document.getElementById("yesBtn");
+    const successMsg = document.getElementById("successMsg");
 
-    noBtn.addEventListener("mouseenter", () => {
-      const x = Math.random() * (window.innerWidth - 100);
-      const y = Math.random() * (window.innerHeight - 50);
-      noBtn.style.left = x + "px";
-      noBtn.style.top = y + "px";
-    });
-
-    function yesClicked() {
-      document.body.innerHTML = `
-        <div style="
-          display:flex;
-          align-items:center;
-          justify-content:center;
-          height:100vh;
-          font-family:Arial;
-          background:#ffebf0;
-          text-align:center;
-        ">
-          <h1 style="color:#e6005c;">
-            💘 YAY!! Best Valentine ever 💘
-          </h1>
-        </div>
-      `;
+    // Place the No button near the card at start
+    function placeNoNearCard() {
+      const card = document.getElementById("card").getBoundingClientRect();
+      const x = card.left + card.width * 0.62;
+      const y = card.top + card.height * 0.70;
+      moveNoTo(x, y);
     }
 
-    // Create floating hearts
-    setInterval(() => {
-      const heart = document.createElement("div");
-      heart.classList.add("heart");
-      heart.innerText = "❤";
-      heart.style.left = Math.random() * 100 + "vw";
-      heart.style.fontSize = Ma
+    function clamp(n, min, max) {
+      return Math.max(min, Math.min(max, n));
+    }
+
+    function moveNoTo(x, y) {
+      const pad = 14;
+      const bw = noBtn.offsetWidth || 90;
+      const bh = noBtn.offsetHeight || 44;
+
+      const nx = clamp(x, pad, window.innerWidth - bw - pad);
+      const ny = clamp(y, pad, window.innerHeight - bh - pad);
+
+      noBtn.style.left = nx + "px";
+      noBtn.style.top  = ny + "px";
+    }
+
+    // Make "No" dodge the mouse so it can't really be clicked
+    function dodge(pointerX, pointerY) {
+      const rect = noBtn.getBoundingClientRect();
+      const cx = rect.left + rect.width / 2;
+      const cy = rect.top + rect.height / 2;
+
+      // Vector away from cursor (randomized a bit)
+      const dx = cx - pointerX;
+      const dy = cy - pointerY;
+      const len = Math.hypot(dx, dy) || 1;
+
+      const speed = 220; // pixels to jump per dodge
+      const jitter = 80; // randomness
+      const targetX = cx + (dx / len) * speed + (Math.random() * jitter - jitter/2);
+      const targetY = cy + (dy / len) * speed + (Math.random() * jitter - jitter/2);
+
+      moveNoTo(targetX - rect.width / 2, targetY - rect.height / 2);
+    }
+
+    // When mouse gets close, run away
+    document.addEventListener("mousemove", (e) => {
+      const rect = noBtn.getBoundingClientRect();
+      const mx = e.clientX, my = e.clientY;
+
+      // distance from mouse to button center
+      const bx = rect.left + rect.width / 2;
+      const by = rect.top + rect.height / 2;
+      const dist = Math.hypot(mx - bx, my - by);
+
+      if (dist < 120) dodge(mx, my);
+    });
+
+    // Extra insurance: if someone tries to click/tap it, dodge anyway
+    noBtn.addEventListener("pointerdown", (e) => {
+      e.preventDefault();
+      dodge(e.clientX, e.clientY);
+    });
+
+    // Yes button celebration
+    yesBtn.addEventListener("click", () => {
+      successMsg.style.display = "block";
+      burstHearts(18);
+    });
+
+    function burstHearts(count) {
+      const hearts = ["💖","💘","💕","💝","❤️"];
+      for (let i = 0; i < count; i++) {
+        const el = document.createElement("div");
+        el.className = "float-heart";
+        el.textContent = hearts[Math.floor(Math.random() * hearts.length)];
+        el.style.left = (Math.random() * (window.innerWidth - 20)) + "px";
+        el.style.top = (window.innerHeight - 40) + "px";
+        el.style.fontSize = (14 + Math.random() * 18) + "px";
+        el.style.animationDuration = (2.8 + Math.random() * 1.6) + "s";
+        document.body.appendChild(el);
+        setTimeout(() => el.remove(), 4500);
+      }
+    }
+
+    // Initial placement + keep on screen on resize
+    window.addEventListener("load", placeNoNearCard);
+    window.addEventListener("resize", placeNoNearCard);
+  </script>
+</body>
+</html>
